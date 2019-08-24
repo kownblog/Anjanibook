@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.4.1/css/all.css"
+      integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Nunito:400,600|Open+Sans:400,600,700"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://abot.netlify.com/main.css" />
+    <title>Anjani Books | Order Tracker</title>
+  </head>
+
+  <body>
+    <div>
+      <main class="dash-content">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="card spur-card">
+                <div class="card-body ">
+                  <div class="mb-2">
+                    <label for="input_id" class="sr-only"
+                      >Enter order id
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="input_id"
+                      placeholder="Enter Order ID"
+                    />
+                  </div>
+                  <button id="check-btn" class="btn btn-warning mb-2">
+                    Check Status
+                  </button>
+                  <div id="fillme"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      document.getElementById("check-btn").addEventListener("click", () => {
+        var ourRequest = new XMLHttpRequest();
+        ourRequest.open("GET", "https://anjanibooks.herokuapp.com/api/orders");
+        ourRequest.onload = function() {
+          var ourData = JSON.parse(ourRequest.responseText);
+          total_orders = ourData.length;
+          renderHTML(ourData);
+        };
+        ourRequest.send();
+      });
+
+      function renderHTML(data) {
+        var htmlString = "";
+
+        for (i = 0; i < data.length; i++) {
+          if (data[i].order_id == document.getElementById("input_id").value) {
+            if (data[i].status_packed == "true") var s_packed = "success";
+            else var s_packed = "danger";
+
+            if (data[i].status_shipped == "true") var s_shipped = "success";
+            else var s_shipped = "danger";
+
+            if (data[i].status_out_for_deivery == "true")
+              var s_out_for_deivery = "success";
+            else var s_out_for_deivery = "danger";
+
+            if (data[i].status_delivered == "true") var s_delivered = "success";
+            else var s_delivered = "danger";
+
+            var id = data[i]._id;
+            htmlString +=
+              `<a class="btn btn-${s_packed} mb-1"><i id="Anchor" class="fas fa-check"></i></a>  Packed <br/>` +
+              `<a class="btn btn-${s_shipped} mb-1"><i id="Anchor" class="fas fa-check"></i></a>  Shipped<br/>` +
+              `<a class="btn btn-${s_out_for_deivery} mb-1"><i id="Anchor"  class="fas fa-check"></i></a>  Out for delivery <br/>` +
+              `<a class="btn btn-${s_delivered} mb-1"><i id="Anchor" class="fas fa-check"></i></a>  Delivered<br/>`;
+
+            document.getElementById("fillme").innerHTML = htmlString;
+            break;
+          } else {
+            document.getElementById("fillme").innerHTML = "NO ORDER FOUND";
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
